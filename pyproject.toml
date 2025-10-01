@@ -4,4 +4,7 @@ version = "0.1.0"
 description = "Agent for Coding"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "litellm>=1.77.5",
+    "sandbox-fusion>=0.3.7",
+]
