@@ -1,0 +1,15 @@
+build
+**/__pycache__
+**/*.pyc
+**/*.pyo
+**/*.pyd
+.venv
+venv
+env
+.env
+*.log
+Dockerfile
+scripts
+README*
+.git
+.gitignore

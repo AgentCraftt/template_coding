@@ -1,102 +1,54 @@
-# Template Coding Agent
+# ReAct Baseline (Server + Container)
 
-This package contains a small-but-extensible layout for experimenting with
-ReAct-style agents under strict Python-only tooling.  The goal is to make it
-easy to plug in additional benchmarks (e.g. HumanEval) while keeping the
-environment setup isolated through [SandboxFusion](https://bytedance.github.io/SandboxFusion/).
+Minimal ReAct-style coding agent with a FastAPI server. The same source files can run either as a Python package (`react_baseline.*`) or flattened under `/workspace` inside a container.
 
-## Project structure
+## Layout
 
 ```
 template_coding/
-├── main.py                  # CLI entry point
-├── agents/
-│   └── react.py             # ReAct implementation (exported via agents.__init__)
-├── tools/
-│   └── python.py            # SandboxFusion-backed Python interpreter
-├── config/
-│   └── env.py               # Provider + sandbox configuration helpers
-└── README.md
+├── react_baseline/
+│   ├── agent.py           # ReAct loop (Python-only tool)
+│   ├── server.py          # FastAPI server (uvicorn entry: server:app or react_baseline.server:app)
+│   ├── llm.py             # LiteLLM wrapper (OpenAI/ChatAnywhere)
+│   └── tools/
+│       └── python_exec.py # In-process Python executor
+├── Dockerfile.volc        # Build an image with react baseline files placed at /workspace/*
+└── requirements.volc.txt  # Runtime deps: fastapi, uvicorn, litellm, dotenv
 ```
 
-Keeping the code organised this way makes it straightforward to add new
-agents or tools.  For example, a future benchmark can live under
-`template_coding/benchmarks/` and import the `react` agent or swap in another
-`tools/*` module.
+## Build container for Volcano Engine
 
-## Environment setup
+Build with the specified base image and place source files directly under `/workspace`:
 
-Install dependencies (using [uv](https://github.com/astral-sh/uv) in this
-example):
-
-```bash
-uv sync
+```
+docker build -f template_coding/Dockerfile.volc -t <REGISTRY>/<NAMESPACE>/react-baseline:<TAG> .
+# If on Apple Silicon and base is amd64:
+docker build --platform=linux/amd64 -f template_coding/Dockerfile.volc -t <REGISTRY>/<NAMESPACE>/react-baseline:<TAG> .
 ```
 
-### Launch a local SandboxFusion server
+Run locally:
 
-If you want model-generated Python to execute in an isolated container,
-run the official SandboxFusion server image.  The following example mirrors
-the configuration from the documentation:
-
-```bash
-docker run -it -p 8080:8080 \
-  -e MEMORY_LIMIT_MB=1024 \
-  -e MAX_CONCURRENT=10 \
-  -e DEFAULT_TIMEOUT=30 \
-  -e SANDBOX_API_KEY=local-secret \
-  volcengine/sandbox-fusion:server-20250609
+```
+docker run --rm -it -p 7777:7777 <REGISTRY>/<NAMESPACE>/react-baseline:<TAG>
+# On Apple Silicon if built for amd64:
+docker run --rm -it --platform=linux/amd64 -p 7777:7777 <REGISTRY>/<NAMESPACE>/react-baseline:<TAG>
 ```
 
-After the container is running, configure the SDK to talk to it:
+The container exposes `POST /run` on port 7777 and accepts the same JSON as above.
 
-```bash
-export SANDBOX_FUSION_API_KEY="local-secret"
-export SANDBOX_FUSION_ENDPOINT="http://localhost:8080"
-# optionally export SANDBOX_FUSION_TEMPLATE / PROJECT / REGION
+Here is an example of trying whether it works or not:
 ```
-
-If the SandboxFusion credentials are missing the agent will surface a
-clear error and skip execution.
-
-### LiteLLM providers
-
-`template_coding.config.env.configure_litellm_provider` wires up
-LiteLLM for OpenAI by default.  To use
-[ChatAnywhere Midpoint](https://www.chatanywhere.com/) configure:
-
-```bash
-export CHATANYWHERE_API_KEY="your-key"
-export CHATANYWHERE_API_BASE="https://api.chatanywhere.tech/v1"  # adjust if needed
+curl -X POST http://localhost:7777/run   -H "Content-Type: application/json"   -d @- <<'EOF'
+{
+  "llm": {
+    "provider": "<your_service_provider>",
+    "model": "gpt-4o-mini",
+    "api_key": "<your_api_key>",
+    "api_base": "<your_api_base>",
+    "temperature": 0.0
+  },
+  "question": "Complete the following code, and return the complete code:\nfrom typing import List\n\ndef has_close_elements(numbers: List[float], threshold: float) -> bool:\n\"\"\" Check if in given list of numbers, are any two numbers closer to each other than\ngiven threshold.\n>>> has_close_elements([1.0, 2.0, 3.0], 0.5)\nFalse\n>>> has_close_elements([1.0, 2.8, 3.0, 4.0, 5.0, 2.0], 0.3)\nTrue\n\"\"\"\n",
+  "max_steps": 4
+}
+EOF
 ```
-
-and pass `--provider chatanywhere` on the CLI.  The helper mirrors the
-values into `OPENAI_API_KEY` / `OPENAI_API_BASE` so OpenAI-compatible
-clients continue to work.
-
-## Running the ReAct agent
-
-```bash
-uv run template_coding/main.py "2+3=?" \
-  --provider chatanywhere \
-  --model gpt-5-mini
-```
-
-The CLI prints the final answer and the full LiteLLM message history so you
-can inspect observations or debugging information from the sandbox.
-
-## Towards benchmark support
-
-- **HumanEval**: SandboxFusion provides first-class dataset helpers.  Follow
-  the instructions at
-  <https://bytedance.github.io/SandboxFusion/docs/docs/how-to/use-dataset/humaneval>
-  to spin up evaluation jobs.  With the current structure you can add a
-  `template_coding/benchmarks/humaneval.py` module that imports
-  `template_coding.agents.react.react` and feeds each prompt to the agent
-  before sending the generated code to SandboxFusion’s evaluator.
-- Additional tools can live under `template_coding/tools/`, while new
-  agent strategies fit naturally in `template_coding/agents/`.
-
-Document any benchmark-specific configuration in this README so that the
-baseline remains easy to reproduce.
-
