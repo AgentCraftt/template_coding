@@ -84,7 +84,7 @@ class CodingAgent:
 
             # 3️⃣ execute safely in sandbox
             sandbox_output = await execute_code(code)
-            obs = sandbox_output.stdout if sandbox_output.stdout else f"Error: {sandbox_output.stderr}"
+            obs = sandbox_output.run_result.stdout if sandbox_output.status.name == "Success" else f"Error: {sandbox_output.run_result.stderr}"
             messages.append({"role": "user", "content": f"Observation: {obs}"})
 
         
