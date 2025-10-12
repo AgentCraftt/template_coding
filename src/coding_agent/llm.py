@@ -1,27 +1,61 @@
-import litellm
-from typing import List
+import os
+import asyncio
+from litellm import acompletion
+from typing import Optional, Dict, Any
 
 class LLM:
-    def __init__(self, model: str, budget: str, api_key: str, api_base: str = None):
+    def __init__(self, model: str = "openai/gpt-4o-mini"):
         self.model = model
-        self.budget = budget
-        self.api_key = api_key
-        self.api_base = api_base
-        self.cost = 0
+        self.max_cost = float(os.getenv("MAX_COST", "0.5"))
+        self.total_cost = 0.0
+        self._lock = asyncio.Lock()
 
-    async def completion(self, messages: List = [], *args, **kwargs) -> str:
-        if "model" in kwargs:
-            kwargs.pop("model")
-        if self.cost >= self.budget:
-            raise Exception("Budget exceeded")
-        response = await litellm.acompletion(
-            model=self.model,
-            messages=messages,
-            api_key=self.api_key,
-            api_base=self.api_base,
-            *args,
-            **kwargs
-        )
-        completion_cost = litellm.completion_cost(completion_response=response)
-        self.cost += completion_cost
-        return response
+    async def _update_cost(self, cost: float) -> bool:
+        """Safely update cumulative cost; return True if exceeds limit."""
+        async with self._lock:
+            self.total_cost += cost
+            return self.total_cost > self.max_cost
+
+    async def acompletion(
+        self,
+        messages: list[Dict[str, str]],
+        **kwargs: Any
+    ) -> str:
+        """
+        Send an async chat request.
+        Returns the model's reply or '<finish>' if cost limit exceeded.
+        """
+        async with self._lock:
+            if self.total_cost >= self.max_cost:
+                return "<finish>"
+
+        try:
+            print(self.model)
+            print(messages)
+            response = await acompletion(
+                model=self.model,
+                messages=messages,
+                **kwargs
+            )
+            print(response)
+            # LiteLLM attaches cost info if known
+            cost = getattr(response, "_hidden_params", {}).get("response_cost", 0.0) or 0.0
+
+            if await self._update_cost(cost):
+                return "<finish>"
+
+            # Handle different response formats
+            if hasattr(response, 'choices') and response.choices:
+                return response.choices[0].message.content
+            elif hasattr(response, 'content'):
+                return response.content
+            else:
+                return str(response)
+
+        except Exception as e:
+            return f"<error: {e}>"
+
+    async def reset_cost(self):
+        """Reset the cost counter."""
+        async with self._lock:
+            self.total_cost = 0.0
