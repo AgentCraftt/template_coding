@@ -57,13 +57,10 @@ class CodingAgent:
         )
 
     async def run(self, question: str) -> Tuple[str, List[dict]]:
-        prompt = (
-            SYSTEM_PROMPT
-            + "\n\n----\n\n# Problem:\n"
-            + str(question)
-        )
-
-        messages: List[dict] = [{"role": "system", "content": prompt}]
+        messages: List[dict] = [
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": f"# Problem:\n{question}"}
+        ]
 
         while True:
             # LLM call
