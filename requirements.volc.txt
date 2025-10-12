@@ -1,5 +1,0 @@
-fastapi>=0.111
-uvicorn>=0.30
-litellm>=1.77.5
-python-dotenv>=1.0
-
