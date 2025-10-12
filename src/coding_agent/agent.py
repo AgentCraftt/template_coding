@@ -90,12 +90,3 @@ class CodingAgent:
         
 async def run_agent(model_name: str, question: str) -> Tuple[str, List[dict]]:
     return await CodingAgent(model_name).run(question)
-
-async def main():
-    answer, history = await run_agent('gemini/gemini-2.5-flash-lite', 'Write a function that adds a + b')
-    print(answer)
-    print(history)
-if __name__ == '__main__':
-    import asyncio
-    asyncio.run(main())
-
