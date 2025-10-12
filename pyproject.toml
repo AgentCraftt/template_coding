@@ -1,9 +1,24 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
 [project]
-name = "coding"
+name = "coding_agent"
 version = "0.1.0"
 description = "Agent for Coding"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "datasets>=4.2.0",
+    "httpx>=0.28.1",
     "litellm>=1.77.5",
+    "socksio>=1.0.0",
 ]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4.2",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/coding_agent"] 
