@@ -10,5 +10,9 @@ wheels/
 .venv
 .env
 
-# test scripts
-test_program.py
+# docker-related to keep clean
+Dockerfile
+docker-compose.yml
+
+# file that customize api provider for llm
+config.yaml

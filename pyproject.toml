@@ -6,11 +6,12 @@ build-backend = "hatchling.build"
 name = "coding-agent"
 version = "0.1.0"
 description = "Agent for Coding"
-readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "litellm>=1.77.5",
     "sandbox-fusion>=0.3.7",
+    "fastapi>=0.104.0",
+    "uvicorn[standard]>=0.24.0",
 ]
 
 [tool.hatch.build.targets.wheel]
