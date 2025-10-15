@@ -1,0 +1,24 @@
+defaults: &chatanywhere_defaults
+  api_key: ${CHATANYWHERE_API_KEY}
+  api_base: https://api.chatanywhere.tech/v1
+
+model_list:
+  - model_name: ca/gpt-5-nano
+    litellm_params:
+      <<: *chatanywhere_defaults
+      model: gpt-5-nano
+
+  - model_name: ca/gpt-5-mini
+    litellm_params:
+      <<: *chatanywhere_defaults
+      model: gpt-5-mini
+
+  - model_name: ca/gpt-5
+    litellm_params:
+      <<: *chatanywhere_defaults
+      model: gpt-5
+
+  - model_name: ca/gpt-4o
+    litellm_params:
+      <<: *chatanywhere_defaults
+      model: gpt-4o-2024-11-20
