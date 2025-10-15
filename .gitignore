@@ -10,5 +10,9 @@ wheels/
 .venv
 .env
 
+# docker-related to keep clean
+Dockerfile
+docker-compose.yml
+
 # test scripts
 test_program.py
