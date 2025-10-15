@@ -34,8 +34,8 @@ SYSTEM_PROMPT = (
     "<answer> def sum(a, b):\n    return a + b </answer>\n"
 )
 class CodingAgent:
-    def __init__(self, model_name: str = "gpt-4o-mini"):
-        self.model = LLM(model_name)
+    def __init__(self, model: LLM):
+        self.model = model
 
     @staticmethod
     def _extract_tag_content(pattern: re.Pattern, text: str) -> Optional[str]:
@@ -88,5 +88,5 @@ class CodingAgent:
 
         return "Cost Exceeded", messages
         
-async def run_agent(model_name: str, question: str) -> Tuple[str, List[dict]]:
-    return await CodingAgent(model_name).run(question)
+async def run_agent(model: str, question: str) -> Tuple[str, List[dict]]:
+    return await CodingAgent(model).run(question)

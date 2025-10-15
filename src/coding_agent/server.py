@@ -13,6 +13,7 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import Dict, Any
 from coding_agent.agent import run_agent
+from coding_agent.llm import LLM
 
 app = FastAPI(title="Agent Server")
 
@@ -27,7 +28,8 @@ async def post_run_agent(req: RunRequest) -> Dict[str, Any]:
     Single endpoint to run the agent with a model name and question.
     """
     try:
-        answer, history = await run_agent(req.model_name, req.question)
+        model = LLM(req.model_name)
+        answer, history = await run_agent(model, req.question)
         return {"answer": answer, "history": history}
 
     except Exception as e:
