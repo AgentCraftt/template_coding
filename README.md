@@ -7,13 +7,11 @@ Minimal ReAct-style coding agent with a FastAPI server. The same source files ca
 ```
 template_coding/
 ├── react_baseline/
-│   ├── agent.py           # ReAct loop (Python-only tool)
-│   ├── server.py          # FastAPI server (uvicorn entry: server:app or react_baseline.server:app)
-│   ├── llm.py             # LiteLLM wrapper (OpenAI/ChatAnywhere)
-│   └── tools/
-│       └── python_exec.py # In-process Python executor
-├── Dockerfile.volc        # Build an image with react baseline files placed at /workspace/*
-└── requirements.volc.txt  # Runtime deps: fastapi, uvicorn, litellm, dotenv
+   ├── agent.py           # ReAct loop (Python-only tool)
+   ├── server.py          # FastAPI server (uvicorn entry: server:app or react_baseline.server:app)
+   ├── llm.py             # LiteLLM wrapper (OpenAI/ChatAnywhere)
+   └── tools/
+       └── python_exec.py # In-process Python executor
 ```
 
 ## Build container for Volcano Engine
@@ -40,15 +38,8 @@ Here is an example of trying whether it works or not:
 ```
 curl -X POST http://localhost:7777/run   -H "Content-Type: application/json"   -d @- <<'EOF'
 {
-  "llm": {
-    "provider": "<your_service_provider>",
-    "model": "gpt-4o-mini",
-    "api_key": "<your_api_key>",
-    "api_base": "<your_api_base>",
-    "temperature": 0.0
-  },
-  "question": "Complete the following code, and return the complete code:\nfrom typing import List\n\ndef has_close_elements(numbers: List[float], threshold: float) -> bool:\n\"\"\" Check if in given list of numbers, are any two numbers closer to each other than\ngiven threshold.\n>>> has_close_elements([1.0, 2.0, 3.0], 0.5)\nFalse\n>>> has_close_elements([1.0, 2.8, 3.0, 4.0, 5.0, 2.0], 0.3)\nTrue\n\"\"\"\n",
-  "max_steps": 4
+  "model": "gpt-4o-mini",
+  "question": "Complete the following code, and return the complete code:\nfrom typing import List\n\ndef has_close_elements(numbers: List[float], threshold: float) -> bool:\n\"\"\" Check if in given list of numbers, are any two numbers closer to each other than\ngiven threshold.\n>>> has_close_elements([1.0, 2.0, 3.0], 0.5)\nFalse\n>>> has_close_elements([1.0, 2.8, 3.0, 4.0, 5.0, 2.0], 0.3)\nTrue\n\"\"\"\n"
 }
 EOF
 ```
