@@ -45,7 +45,7 @@ class LLM:
         try:
             response = await acompletion(model=self.model, messages=messages, **kwargs)
             # LiteLLM attaches cost info if known
-            await self._update
+            await self._update(messages, response)
             return response
         except Exception as e:
             raise e
