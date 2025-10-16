@@ -16,8 +16,9 @@ app = FastAPI(title="Agent Server")
 
 
 class RunRequest(BaseModel):
-    model_name: str
     question: str
+    model: str
+    max_cost: str
 
 
 @app.post("/run_agent")
@@ -26,8 +27,8 @@ async def post_run_agent(req: RunRequest) -> Dict[str, Any]:
     Single endpoint where we will run the agent with a model name and question.
     """
     try:
-        model = LLM(req.model_name)
-        answer = await run_agent(model, req.question)
-        return answer
+        llm = LLM(req.model)
+        answer = await run_agent(llm, req.question, req.max_cost)
+        return answer, llm._requests
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

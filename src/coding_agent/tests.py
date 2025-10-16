@@ -17,7 +17,7 @@ async def test_server_connects_to_agent_interface(monkeypatch):
 
     monkeypatch.setattr("coding_agent.server.run_agent", fake_run_agent, raising=True)
 
-    req = RunRequest(model_name="dummy-model", question="What is 2+2?")
+    req = RunRequest(model="dummy-model", question="What is 2+2?")
     body = await post_run_agent(req)
     assert body["answer"] == "4"
     assert isinstance(body["history"], list)
@@ -36,7 +36,7 @@ async def test_server_propagates_agent_errors(monkeypatch):
         "coding_agent.server.run_agent", failing_run_agent, raising=True
     )
 
-    req = RunRequest(model_name="dummy-model", question="Anything")
+    req = RunRequest(model="dummy-model", question="Anything")
     with pytest.raises(HTTPException) as ei:
         await post_run_agent(req)
     assert ei.value.status_code == 500
