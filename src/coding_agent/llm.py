@@ -4,7 +4,7 @@ from litellm import acompletion, ModelResponse, completion_cost
 from typing import Dict, Any
 
 
-class CostExeeeded(Exception):
+class CostExceeded(Exception):
     pass
 
 
@@ -40,7 +40,7 @@ class LLM:
         Returns the model's reply or '<finish>' if cost limit exceeded.
         """
         if await self._exceeds_limit():
-            raise CostExeeeded("Cost limit exceeded")
+            raise CostExceeded("Cost limit exceeded")
 
         try:
             response = await acompletion(model=self.model, messages=messages, **kwargs)
