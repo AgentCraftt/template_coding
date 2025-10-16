@@ -14,6 +14,7 @@ from coding_agent.llm import LLM
 
 app = FastAPI(title="Agent Server")
 
+
 class RunRequest(BaseModel):
     model_name: str
     question: str
@@ -26,8 +27,7 @@ async def post_run_agent(req: RunRequest) -> Dict[str, Any]:
     """
     try:
         model = LLM(req.model_name)
-        answer, history = await run_agent(model, req.question)
-        return {"answer": answer, "history": history}
-
+        answer = await run_agent(model, req.question)
+        return answer
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

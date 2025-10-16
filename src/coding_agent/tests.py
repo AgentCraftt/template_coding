@@ -9,6 +9,7 @@ async def test_server_connects_to_agent_interface(monkeypatch):
     Verify the endpoint function calls the agent interface and returns its output.
     Uses monkeypatch to avoid real LLM/sandbox calls.
     """
+
     async def fake_run_agent(model_name: str, question: str):
         assert model_name == "dummy-model"
         assert question == "What is 2+2?"
@@ -27,10 +28,13 @@ async def test_server_propagates_agent_errors(monkeypatch):
     """
     If the agent raises, the endpoint should raise HTTPException 500 with detail.
     """
+
     async def failing_run_agent(model_name: str, question: str):
         raise RuntimeError("agent failed")
 
-    monkeypatch.setattr("coding_agent.server.run_agent", failing_run_agent, raising=True)
+    monkeypatch.setattr(
+        "coding_agent.server.run_agent", failing_run_agent, raising=True
+    )
 
     req = RunRequest(model_name="dummy-model", question="Anything")
     with pytest.raises(HTTPException) as ei:
