@@ -17,7 +17,7 @@ class LLM:
         self._lock = asyncio.Lock()
 
     async def _update(self, messages: list[Dict[str, str]], response: float) -> bool:
-        """Safely update cumulative cost; return True if exceeds limit."""
+        """Safely update cumulative cost."""
         async with self._lock:
             cost = completion_cost(self.model, response)
             self.cost += cost
@@ -31,6 +31,7 @@ class LLM:
             )
 
     async def _exceeds_limit(self) -> bool:
+        """Return True if cumulative cost exceeds max_cost."""
         async with self._lock:
             return self.cost >= self.max_cost
 
