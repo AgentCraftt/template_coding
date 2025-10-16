@@ -3,6 +3,17 @@ import asyncio
 from litellm import acompletion
 from typing import Optional, Dict, Any
 
+class CostExceeded(Exception):
+    """Raised when the cost limit is exceeded."""
+    def __init__(self, message, current_cost=None, max_cost=None):
+        super().__init__(message)
+        self.current_cost = current_cost
+        self.max_cost = max_cost
+
+    def __str__(self):
+        base = super().__str__()
+        return f"{base} (current: {self.current_cost}, limit: {self.max_cost})"
+
 class LLM:
     def __init__(self, model: str = "openai/gpt-4o-mini"):
         self.model = model
@@ -23,26 +34,23 @@ class LLM:
     ) -> str:
         """
         Send an async chat request.
-        Returns the model's reply or '<finish>' if cost limit exceeded.
+        Returns the model's reply or raise Error if cost limit exceeded.
         """
-        async with self._lock:
-            if self.total_cost >= self.max_cost:
-                return "<finish>"
+        if self.total_cost >= self.max_cost:
+            raise CostExceeded("Cost limit exceeded", current_cost=self.total_cost, max_cost=self.max_cost)
 
         try:
-            print(self.model)
-            print(messages)
             response = await acompletion(
                 model=self.model,
                 messages=messages,
                 **kwargs
             )
-            print(response)
+
             # LiteLLM attaches cost info if known
             cost = getattr(response, "_hidden_params", {}).get("response_cost", 0.0) or 0.0
 
             if await self._update_cost(cost):
-                return "<finish>"
+                raise CostExceeded("Cost limit exceeded", current_cost=self.total_cost, max_cost=self.max_cost)
 
             # Handle different response formats
             if hasattr(response, 'choices') and response.choices:
@@ -50,10 +58,10 @@ class LLM:
             elif hasattr(response, 'content'):
                 return response.content
             else:
-                return str(response)
+                return response
 
         except Exception as e:
-            return f"<error: {e}>"
+            raise e
 
     async def reset_cost(self):
         """Reset the cost counter."""

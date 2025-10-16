@@ -52,7 +52,7 @@ class CodingAgent:
             return code
         
     def _extract_answer(self, text: str) -> Optional[str]:
-        """Extract final <finish> or <finish> answer."""
+        """Extract final <answer> tagged answer."""
         return (
             CodingAgent._extract_tag_content(FINISH_REGEX, text)
         )
@@ -62,31 +62,31 @@ class CodingAgent:
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": f"# Problem:\n{question}"}
         ]
+        try:
+            while True:
+                # LLM call
+                response = await self.model.acompletion(messages=messages)
+                messages.append({"role": "assistant", "content": response})
 
-        while True:
-            # LLM call
-            response = await self.model.acompletion(messages=messages)
-            messages.append({"role": "assistant", "content": response})
+                # extract <execute> code
+                code = self._extract_code(response)
+                # check for <answer> tag
+                answer = self._extract_answer(response)
+                if code:
+                    # 3️⃣ execute safely in sandbox
+                    sandbox_output = await execute_code(code)
+                    obs = sandbox_output.run_result
+                    messages.append({"role": "user", "content": f"Observation: {obs}"})
+                    continue
+                
+                if answer:
+                    return answer, messages
 
-            # extract <execute> code
-            code = self._extract_code(response)
-            # check for <finish> / <finish>
-            answer = self._extract_answer(response)
-            if code:
-                # 3️⃣ execute safely in sandbox
-                sandbox_output = await execute_code(code)
-                obs = sandbox_output.run_result
-                messages.append({"role": "user", "content": f"Observation: {obs}"})
-                continue
-            
-            if answer:
-                return answer, messages
-
-            if not code:
-                observation = "Invalid action: please use <execute>...</execute> if you want to verify your solution. Otherwise return with <answer> ... </answer>"
-                messages.append({"role": "user", "content": f"Observation: {observation}"})
-
-        return "Cost Exceeded", messages
+                if not code:
+                    observation = "Invalid action: please use <execute>...</execute> if you want to verify your solution. Otherwise return with <answer> ... </answer>"
+                    messages.append({"role": "user", "content": f"Observation: {observation}"})
+        except Exception as e:
+            return str(e), messages
         
-async def run_agent(model: str, question: str) -> Tuple[str, List[dict]]:
+async def run_agent(model: LLM, question: str) -> Tuple[str, List[dict]]:
     return await CodingAgent(model).run(question)
