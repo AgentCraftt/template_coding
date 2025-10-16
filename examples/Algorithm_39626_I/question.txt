@@ -1,0 +1,35 @@
+## Question
+
+Your task is to implement a function to determine if a given word can be constructed using a set of given tiles. Each tile has a letter, and each letter can be used only once to form the word.
+
+### Function Signature
+```python
+def can_form_word(tiles: str, word: str) -> bool:
+    """Check if a given word can be formed using the given tiles."""
+```
+
+### Input
+- `tiles` (str): A string representing the available tiles, each character in the string is a tile with a letter.
+- `word` (str): A string representing the word to be formed.
+
+### Output
+- Returns `True` if the word can be formed using the tiles, and `False` otherwise.
+
+### Example
+```python
+can_form_word("aabbcc", "abc")
+# Expected Output: True
+
+can_form_word("aabbcc", "abccba")
+# Expected Output: True
+
+can_form_word("aabbcc", "abcd")
+# Expected Output: False
+```
+
+### Constraints
+* The length of the `tiles` string and the `word` string will not exceed 1000 characters.
+* Only lowercase English letters are used in both `tiles` and `word`.
+
+### Scenario
+Imagine you are designing a word game where players must create words using a set of letter tiles. You need a function to verify if the word they want to create is possible with the given tiles, ensuring a fair and fun gaming experience.

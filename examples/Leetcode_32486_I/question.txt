@@ -1,0 +1,1 @@
+You are given a list of strings `words` of length `n`. Each string in `words` is uppercase and has the same length. You need to find the length of the **longest common prefix** shared among all the strings in the list `words`. A common prefix is a substring that appears at the beginning of each string. If there is no common prefix, return `0`.

@@ -1,0 +1,1 @@
+You are given a **0-indexed** integer array `heights` representing the heights of buildings within a city. The city has a rule that a building can see the sunset if there are no taller buildings to its right. Return _the list of indices of the buildings that can see the sunset_, in **ascending** order.

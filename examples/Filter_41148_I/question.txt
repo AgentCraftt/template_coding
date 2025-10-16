@@ -1,0 +1,1 @@
+Craft a software routine that effectively finds and delivers the position within an array, particularly a sequence that is sorted, of a given number utilizing the methods of binary search.
