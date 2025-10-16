@@ -4,7 +4,7 @@ from litellm import acompletion, ModelResponse, completion_cost
 from typing import Dict, Any
 
 
-class CostExeeeded(Exception):
+class CostExceeded(Exception):
     pass
 
 
@@ -17,7 +17,7 @@ class LLM:
         self._lock = asyncio.Lock()
 
     async def _update(self, messages: list[Dict[str, str]], response: float) -> bool:
-        """Safely update cumulative cost; return True if exceeds limit."""
+        """Safely update cumulative cost."""
         async with self._lock:
             cost = completion_cost(self.model, response)
             self.cost += cost
@@ -31,6 +31,7 @@ class LLM:
             )
 
     async def _exceeds_limit(self) -> bool:
+        """Return True if cumulative cost exceeds max_cost."""
         async with self._lock:
             return self.cost >= self.max_cost
 
@@ -40,12 +41,12 @@ class LLM:
         Returns the model's reply or '<finish>' if cost limit exceeded.
         """
         if await self._exceeds_limit():
-            raise CostExeeeded("Cost limit exceeded")
+            raise CostExceeded("Cost limit exceeded")
 
         try:
             response = await acompletion(model=self.model, messages=messages, **kwargs)
             # LiteLLM attaches cost info if known
-            await self._update
+            await self._update(messages, response)
             return response
         except Exception as e:
             raise e
