@@ -15,4 +15,5 @@ Dockerfile
 docker-compose.yml
 
 # test scripts
-test_program.py
+eval_log_*.txt
+evaluation_results.json

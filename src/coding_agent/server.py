@@ -15,20 +15,30 @@ from coding_agent.llm import LLM
 app = FastAPI(title="Agent Server")
 
 
-class RunRequest(BaseModel):
+class AgentInput(BaseModel):
     question: str
     model: str
-    max_cost: str
+    max_cost: float
+    
+
+class AgentResponse(BaseModel):
+    code: str
+    logs: list[Dict[str, Any]]
 
 
 @app.post("/run_agent")
-async def post_run_agent(req: RunRequest) -> Dict[str, Any]:
+async def post_run_agent(req: AgentInput) -> AgentResponse:
     """
     Single endpoint where we will run the agent with a model name and question.
     """
     try:
-        llm = LLM(req.model)
-        answer = await run_agent(llm, req.question, req.max_cost)
-        return answer, llm._requests
+        llm = LLM(req.model, max_cost=req.max_cost)
+        code = await run_agent(llm, req.question)
+        return AgentResponse(
+            code=code,
+            logs=llm._logs
+        )
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))

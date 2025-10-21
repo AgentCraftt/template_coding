@@ -1,6 +1,6 @@
 import pytest
 from fastapi import HTTPException
-from coding_agent.server import RunRequest, post_run_agent
+from coding_agent.server import AgentInput, post_run_agent
 
 
 @pytest.mark.asyncio
@@ -17,7 +17,7 @@ async def test_server_connects_to_agent_interface(monkeypatch):
 
     monkeypatch.setattr("coding_agent.server.run_agent", fake_run_agent, raising=True)
 
-    req = RunRequest(model="dummy-model", question="What is 2+2?", max_cost="1.0")
+    req = AgentInput(model="dummy-model", question="What is 2+2?", max_cost="1.0")
     result = await post_run_agent(req)
     assert result[0] == "4"
     assert isinstance(result[1], list)
@@ -36,7 +36,7 @@ async def test_server_propagates_agent_errors(monkeypatch):
         "coding_agent.server.run_agent", failing_run_agent, raising=True
     )
 
-    req = RunRequest(model="dummy-model", question="Anything", max_cost="1.0")
+    req = AgentInput(model="dummy-model", question="Anything", max_cost="1.0")
     with pytest.raises(HTTPException) as ei:
         await post_run_agent(req)
     assert ei.value.status_code == 500
