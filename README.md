@@ -6,7 +6,7 @@ This is a programming assignment designed to help students learn about building 
 
 In this assignment, you will build a coding agent that:
 1. Receives coding problems as natural language questions
-2. Uses an LLM to generate solutions
+2. Utilizes LLM and tools to generate Python code solutions
 3. Returns valid Python code that passes test cases
 
 The agent is exposed through a FastAPI server with a standardized interface for online judge evaluation.
@@ -33,18 +33,14 @@ coding/
 ├── evaluate.py               # Evaluation script
 └── pyproject.toml            # Project dependencies
 ```
-## Assignment Requirements
 
 ### What You Need to Do
 
-**Implement the `run_agent` function in `src/coding_agent/agent.py`**
-
-Your agent should:
-- Accept an `LLM` instance and a coding problem question
-- Use the LLM to generate a solution
-- Return valid Python code (as a string) that solves the problem
-- Handle edge cases and errors appropriately
-- Stay within the cost budget (controlled by `llm.max_cost`)
+- **Implement the `run_agent` function in `src/coding_agent/agent.py`**
+- Feel free to add file/classes/functions as needed within the `coding_agent` package.
+- Feel free to add any dependencies use `uv`.
+- Feel free to add tools in `coding_agent/tools/` if needed.
+- Use the provided LLM interface and code execution tool to build your agent.
 
 ### What You Cannot Modify
 
@@ -63,7 +59,7 @@ You have access to:
 
 1. **LLM Interface** (`coding_agent.llm.LLM`):
    ```python
-   llm = LLM(model="openai/gpt-4o-mini", max_cost=1.0)
+   llm = LLM(model="openai/gpt-5-mini", max_cost=1.0)
    response = await llm.acompletion(messages=[
        {"role": "system", "content": "You are a Python expert"},
        {"role": "user", "content": "Write a function to add two numbers"}
@@ -85,52 +81,7 @@ You have access to:
 
 3. **Cost Tracking**: The LLM automatically tracks costs and raises `CostExceeded` when the budget is exhausted
 
-## Setup Instructions
-
-### Prerequisites
-- Python 3.12 or higher
-- [uv](https://github.com/astral-sh/uv) package manager
-
-### Installation
-
-1. Clone the repository:
-```bash
-git clone <repository-url>
-cd coding
-```
-
-2. Install dependencies:
-```bash
-uv sync
-```
-
-3. Set up Sandbox Fusion (for code execution):
-```bash
-# Set the sandbox endpoint (if using a remote sandbox)
-export SANDBOX_FUSION_ENDPOINT=http://localhost:7777
-```
-
-4. Configure your LLM API keys:
-```bash
-# For OpenAI
-export OPENAI_API_KEY=your-api-key
-
-# For other providers, see LiteLLM documentation
-# https://docs.litellm.ai/docs/providers
-```
-
-## Development
-
-### Running the Server Locally
-
-Start the FastAPI server:
-```bash
-uv run uvicorn coding_agent.server:app --host localhost --port 8888
-```
-
-The API documentation will be available at `http://localhost:8888/docs`
-
-### Testing Your Agent
+## Testing Your Agent
 
 You can test individual examples manually:
 ```bash
@@ -144,7 +95,7 @@ curl -X POST http://localhost:8888/run_agent \
   }'
 ```
 
-## Evaluation
+## Evaluation with Public Examples
 
 ### Running the Evaluation Script
 
@@ -157,52 +108,7 @@ The `evaluate.py` script will:
 
 Run evaluation:
 ```bash
-python evaluate.py --model "gemini/gemini-2.5-pro" --max-cost 1.0
-```
-
-Options:
-- `--model`: The LLM model to use (default: "gemini/gemini-2.5-pro")
-- `--max-cost`: Maximum cost allowed per example (default: 1.0)
-
-### Evaluation Output
-
-After running evaluation, you'll see:
-- Console output with pass/fail summary
-- `evaluation_results.json`: Detailed results for each example
-- `eval_log_<timestamp>.txt`: Server logs
-
-Example output:
-```
-============================================================
-EVALUATION SUMMARY
-============================================================
-Passed: 8/10 (80.0%)
-
-Detailed Results:
-Detailed Results:
-  ✓ Algorithm_20713_I
-  ✓ Algorithm_39626_I
-  ✗ Filter_28763_I
-  ✓ Filter_36434_I
-  ...
-```
-
-## Example Problems
-
-Check the `examples/` directory for sample problems. Each example contains:
-- `question.txt`: The coding problem description
-- `test.py`: Test cases your solution must pass
-- `solution.py`: A reference solution (for learning)
-- `metadata.json`: Problem metadata
-
-Example structure:
-```
-examples/
-└── Algorithm_20713_I/
-    ├── question.txt      # "Implement the flatten_list function..."
-    ├── test.py           # import pytest; def test_flatten_list(): ...
-    ├── solution.py       # def flatten_list(nested_list): ...
-    └── metadata.json     # {"difficulty": "easy", ...}
+uv run python evaluate.py
 ```
 
 ## Grading Criteria
@@ -213,49 +119,8 @@ Your agent will be evaluated on:
 3. **Code Quality**: Clean, maintainable implementation in `agent.py`
 4. **Error Handling**: Graceful handling of edge cases and failures
 
-## Tips for Success
-
-1. **Start Simple**: Begin with a basic implementation that prompts the LLM and extracts code
-2. **Iterate**: Test with examples and improve your prompting strategy
-3. **Use Tools Wisely**: Consider when to use code execution for validation
-4. **Manage Costs**: Be mindful of LLM API costs and implement efficient strategies
-5. **Read Examples**: Study the example problems to understand expected input/output formats
-6. **Test Locally**: Use the evaluation script frequently during development
-
-## Common Issues
-
-### Cost Exceeded Errors
-If you see `CostExceeded` exceptions, your agent is making too many LLM calls or using expensive models. Consider:
-- Using cheaper models for simpler problems
-- Reducing the number of retry attempts
-- Optimizing your prompts to get better results in fewer calls
-
-### Code Extraction Failures
-If your agent returns empty code or fails to extract code blocks:
-- Ensure your prompts clearly request code in markdown format (` ```python ... ``` `)
-- Use robust regex patterns to extract code
-- Validate extracted code before returning
-
-### Sandbox Connection Errors
-If code execution fails:
-- Check that Sandbox Fusion is running at the configured endpoint
-- Verify `SANDBOX_FUSION_ENDPOINT` environment variable
-- Test the sandbox independently using `tools/code_executor.py`
-
 ## Resources
 
 - [LiteLLM Documentation](https://docs.litellm.ai/) - For LLM integration
 - [FastAPI Documentation](https://fastapi.tiangolo.com/) - For understanding the server
 - [Sandbox Fusion](https://github.com/your-org/sandbox-fusion) - For code execution
-
-## Support
-
-If you encounter issues:
-1. Check the `eval_log_*.txt` files for detailed error messages
-2. Review your implementation against the assignment requirements
-3. Test with simpler examples first before complex ones
-4. Consult the course staff during office hours
-
-## License
-
-This project is for educational purposes only.

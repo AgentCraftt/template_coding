@@ -1,1 +1,0 @@
-Given a list of numbers, propose code that returns the number of distinct elements in the list. Additionally, ensure that the solution has a time complexity of O(nlogn), where n is the length of the list.

@@ -1,5 +1,0 @@
-You are given two integer arrays `arr1` and `arr2` of length `n`, representing the coordinates of points in a 2D plane. The `i`-th point in this plane has coordinates `(arr1[i], arr2[i])`. Your task is to find a pair of distinct points such that the distance between them is minimized, and return the indices of these two points as a list `[i, j]` with `i < j`.
-
-The distance between two points `(x1, y1)` and `(x2, y2)` is calculated as `|x1 - x2| + |y1 - y2|`, where `|a|` denotes the absolute value of `a`.
-
-If there are multiple pairs with the same minimum distance, you may return any of them.

@@ -19,7 +19,7 @@ class AgentInput(BaseModel):
     question: str
     model: str
     max_cost: float
-    
+
 
 class AgentResponse(BaseModel):
     code: str
@@ -34,11 +34,9 @@ async def post_run_agent(req: AgentInput) -> AgentResponse:
     try:
         llm = LLM(req.model, max_cost=req.max_cost)
         code = await run_agent(llm, req.question)
-        return AgentResponse(
-            code=code,
-            logs=llm._logs
-        )
+        return AgentResponse(code=code, logs=llm._logs)
     except Exception as e:
         import traceback
+
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))

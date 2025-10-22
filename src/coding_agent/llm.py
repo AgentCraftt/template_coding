@@ -30,6 +30,7 @@ async def acompletion_with_retry(
     response = await acompletion(model=model, messages=messages, **kwargs)
     return response
 
+
 class LLM:
     def __init__(self, model: str = "openai/gpt-4o-mini", max_cost: float = 1):
         self.model = model
@@ -38,10 +39,12 @@ class LLM:
         self._logs = []
         self._lock = asyncio.Lock()
 
-    async def _update(self, messages: list[Dict[str, str]], response: ModelResponse) -> bool:
+    async def _update(
+        self, messages: list[Dict[str, str]], response: ModelResponse
+    ) -> bool:
         """Safely update cumulative cost."""
         async with self._lock:
-            cost = completion_cost(response)
+            cost = completion_cost(response, messages=messages)
             self.cost += cost
             self._logs.append(
                 dict(
@@ -58,7 +61,9 @@ class LLM:
         async with self._lock:
             return self.cost >= self.max_cost
 
-    async def acompletion(self, messages: list[Dict[str, str]], **kwargs: Any) -> ModelResponse:
+    async def acompletion(
+        self, messages: list[Dict[str, str]], **kwargs: Any
+    ) -> ModelResponse:
         """
         Send an async chat request.
         Args:
@@ -70,7 +75,9 @@ class LLM:
         if await self._exceeds_limit():
             raise CostExceeded("Cost limit exceeded")
 
-        response = await acompletion_with_retry(model=self.model, messages=messages, **kwargs)
+        response = await acompletion_with_retry(
+            model=self.model, messages=messages, **kwargs
+        )
         await self._update(messages, response)
         return response
 

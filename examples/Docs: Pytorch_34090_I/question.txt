@@ -1,0 +1,46 @@
+**Question: Converting and Processing Tensors using DLPack and PyTorch**
+
+Given a tensor in DLPack format, you are required to perform the following steps:
+
+1. Convert the DLPack tensor to a PyTorch tensor using `torch.utils.dlpack.from_dlpack`.
+2. Perform a series of operations on the PyTorch tensor:
+   - Normalize the tensor such that its values range between 0 and 1.
+   - Compute the element-wise square of the normalized tensor.
+   - Compute the transpose of the resulting tensor.
+3. Convert the final PyTorch tensor back to DLPack format using `torch.utils.dlpack.to_dlpack`.
+
+**Function Signature:**
+
+```python
+def process_dlpack_tensor(dlpack_tensor) -> 'dlpack_tensor':
+    pass
+```
+
+**Input:**
+- `dlpack_tensor`: A tensor in DLPack format.
+
+**Output:**
+- A tensor in DLPack format that is the result of the described operations.
+
+**Constraints:**
+- The input tensor can be of any shape, but it is guaranteed to have numerical values.
+- The operations should not involve any in-place modifications to ensure the integrity of the original data.
+
+**Examples:**
+Assume `input_dlpack_tensor` is a DLPack tensor corresponding to `[[1, 2], [3, 4]]` in PyTorch.
+
+```python
+output_dlpack_tensor = process_dlpack_tensor(input_dlpack_tensor)
+
+# when converting output_dlpack_tensor back to PyTorch tensor
+print(output_pytorch_tensor)
+# Output: tensor([[0.0000, 0.4444],
+#                 [0.1111, 1.0000]])
+```
+
+**Explanation:**
+1. The input tensor `[[1, 2], [3, 4]]` is normalized to `[[0.0, 0.3333], [0.6667, 1.0]]`.
+2. Squaring element-wise results in `[[0.0, 0.1111], [0.4444, 1.0]]`.
+3. Transposing the tensor yields `[[0.0000, 0.4444], [0.1111, 1.0000]]`.
+
+Write the `process_dlpack_tensor` function to achieve this.

@@ -1,0 +1,33 @@
+### Problem Statement
+
+2. **Function to Implement**:
+   Write a function `find_subarrays_with_sum(arr: Sequence[int], target_sum: int) -> int` that takes two parameters:
+   * `arr` (sequence of integers): An array of integers.
+   * `target_sum` (integer): The target sum value.
+
+#### Expected Output:
+This function should return the number of contiguous subarrays that sum up to the `target_sum`.
+
+### Constraints
+* 1 <= len(arr) <= 10^5
+* -10^3 <= arr[i] <= 10^3 for any valid index `i`
+* -10^5 <= target_sum <= 10^5
+
+### Example
+
+```python
+>>> find_subarrays_with_sum([1, 1, 1], 2)
+2
+>>> find_subarrays_with_sum([10, 2, -2, -20, 10], -10)
+3
+```
+
+### Notes
+* You can assume that the input format is correct.
+* Optimize your solution to run within practical limits for large input sizes.
+* Consider edge cases such as arrays with a single element or arrays where no subarrays sum to the `target_sum`.
+
+### Task Breakdown
+1. Implement an additional helper function, if necessary, to support `find_subarrays_with_sum`.
+2. Ensure an efficient algorithm, potentially using cumulative sums or a sliding window approach.
+3. Handle edge cases appropriately, including when the array is empty or when the `target_sum` is zero.

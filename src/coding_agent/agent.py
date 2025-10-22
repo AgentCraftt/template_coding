@@ -40,7 +40,7 @@ Remember to:
 
     messages = [
         {"role": "system", "content": system_prompt},
-        {"role": "user", "content": user_prompt}
+        {"role": "user", "content": user_prompt},
     ]
 
     # Call the LLM

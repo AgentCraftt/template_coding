@@ -1,1 +1,0 @@
-Write a function in Python that takes an array of integers and returns a string containing the values separated by commas.

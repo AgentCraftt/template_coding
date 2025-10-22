@@ -1,3 +1,0 @@
-This problem requires you to implement a function that reproduces the behavior of the Unix `echo` command. The function, called `echo`, takes a string as input and prints it. The function also takes an optional flag `-n` to suppress the trailing newline character. Here is how you can test the function:
-
-```
