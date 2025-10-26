@@ -167,6 +167,7 @@ class AgentEvaluator:
 
         return {
             "name": example["name"],
+            "code": code,
             "passed": passed,
             "difficulty": example["metadata"].get("difficulty", "unknown"),
             "cost": total_cost,
