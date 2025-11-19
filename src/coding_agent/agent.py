@@ -24,13 +24,13 @@ SYSTEM_PROMPT = (
     "Example session:\n\n"
     "Problem:\nWrite a program that sums a + b\n"
     "<thought> I should design a function that takes two inputs a and b that returns their sum.\n"
-    "I also need to test the function before returning it.\n"
-    "<execute> def sum(a, b):\n    return a + b\n\nif __name__ == '__main__':\n    assert sum(3, 4) == 7\n</execute>"
-    "PAUSE\n"    
-    "You will be called again with this:\n\n"
-    "Observation: {'status': 'success', 'stdout': '', 'stderr': ''}"
-    "You then output:"
-    "<thought> The assertion error did not arise. The function sum(a, b) is correct. I can now return it.\n"
+    "I also need to test the function before returning it. </thought>\n"
+    "<execute> def sum(a, b):\n    return a + b\n\nif __name__ == '__main__':\n    assert sum(3, 4) == 7 </execute>\n"
+    "PAUSE\n"
+    "You will be called again with the observation of your action:\n\n"
+    "Observation: {'status': 'success', 'stdout': '', 'stderr': ''}\n"
+    "You will then output the answer once you have verified the correctness of your code, otherwise you can continue to verify the code through <execute>:\n"
+    "<thought> The assertion error did not arise. The function sum(a, b) is correct. I can now return it. </thought>\n"
     "<answer> def sum(a, b):\n    return a + b </answer>\n"
 )
 class CodingAgent:
@@ -66,12 +66,13 @@ class CodingAgent:
             while True:
                 # LLM call
                 response = await self.model.acompletion(messages=messages)
-                messages.append({"role": "assistant", "content": response})
+                response_content = response.choices[0].message.content
+                messages.append({"role": "assistant", "content": response_content})
 
                 # extract <execute> code
-                code = self._extract_code(response)
+                code = self._extract_code(response_content)
                 # check for <answer> tag
-                answer = self._extract_answer(response)
+                answer = self._extract_answer(response_content)
                 if code:
                     # 3️⃣ execute safely in sandbox
                     sandbox_output = await execute_code(code)
