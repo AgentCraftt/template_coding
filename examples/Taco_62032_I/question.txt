@@ -1,0 +1,27 @@
+Given a list of integers, find the length of the longest arithmetic subsequence (LAS) in the array.
+
+For this problem, a subsequence is defined as a sequence that can be derived from the array by deleting some or no elements without changing the order of the remaining elements. An arithmetic sequence is a sequence of numbers such that the difference between consecutive terms is constant.
+
+Example 1:
+
+Input: [3, 6, 9, 12]
+
+Output: 4
+
+Explanation: The whole array is an arithmetic sequence with a common difference of 3.
+
+Example 2:
+
+Input: [9, 4, 7, 2, 10]
+
+Output: 3
+
+Explanation: The longest arithmetic subsequence is [4, 7, 10].
+
+Example 3:
+
+Input: [20, 1, 15, 3, 10, 5, 8]
+
+Output: 4
+
+Explanation: The longest arithmetic subsequence is [20, 15, 10, 5] with a common difference of -5.

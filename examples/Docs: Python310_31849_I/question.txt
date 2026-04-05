@@ -1,0 +1,74 @@
+You are tasked with implementing a function to convert a stereo WAV file to mono. A mono WAV file has only one audio channel, while a stereo file has two. To achieve this, you need to average the left and right channel samples for each frame.
+
+### Function Signature
+```python
+def stereo_to_mono(input_wav: str, output_wav: str) -> None:
+    """
+    This function converts a stereo WAV file to mono.
+
+    :param input_wav: Path to the input stereo WAV file
+    :param output_wav: Path to output the mono WAV file
+    :return: None
+    """
+
+# Your implementation here
+```
+
+### Input
+- `input_wav`: A string representing the file path to the input stereo WAV (.wav) file.
+- `output_wav`: A string representing the file path where the output mono WAV (.wav) file should be saved.
+
+### Output
+- A mono WAV file saved at the path specified by `output_wav`.
+
+### Constraints
+- Assume the input WAV file is in the WAVE_FORMAT_PCM format.
+- The sample width will be 2 bytes (16 bits) at all times.
+- The input WAV file will always have a frame rate of 44100 Hz.
+- The input WAV file will always use 2-channels (stereo).
+
+### Example
+Suppose the `input_wav` points to a stereo WAV file with 100 audio frames.
+The output should be a new mono WAV file at `output_wav` with the same audio frames, but averaged into one channel.
+
+### Steps
+1. Open the input stereo WAV file in 'rb' (read binary) mode.
+2. Read all parameters (number of channels, sample width, frame rate, etc.) using the appropriate methods on the `Wave_read` object.
+3. Initialize a `Wave_write` object to create the output mono WAV file.
+4. Set the necessary parameters for the output file:
+   - 1 channel
+   - The same sample width
+    - Same frame rate
+5. Read frames from the input file, process them to average the channels, and write them to the output file.
+6. Close both files properly.
+
+### Notes
+- You may use the `struct` module to handle the binary data conversion between bytes and integers if needed.
+- Ensure you handle file operations and exceptions properly.
+
+### Code Template
+```python
+import wave
+import struct
+
+def stereo_to_mono(input_wav: str, output_wav: str) -> None:
+    with wave.open(input_wav, 'rb') as in_wave:
+        params = in_wave.getparams()
+        if params.nchannels != 2:
+            raise wave.Error("Input file is not stereo")
+        
+        with wave.open(output_wav, 'wb') as out_wave:
+            out_wave.setparams((1, params.sampwidth, params.framerate, params.nframes, params.comptype, params.compname))
+            
+            for _ in range(params.nframes):
+                # Read one frame (2 samples - left and right channel)
+                frame_data = in_wave.readframes(1)
+                left, right = struct.unpack('<hh', frame_data)
+                
+                # Calculate the average and pack it back
+                mono_value = (left + right) // 2
+                out_wave.writeframes(struct.pack('<h', mono_value))
+
+# Sample usage
+# stereo_to_mono('stereo_sample.wav', 'mono_output.wav')
+```

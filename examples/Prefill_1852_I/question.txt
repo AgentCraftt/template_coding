@@ -1,0 +1,1 @@
+Write a function to create a symmetric dense matrix from a vector.
