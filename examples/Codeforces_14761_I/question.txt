@@ -1,0 +1,33 @@
+Jamie is working on a software module that helps manage a list of tasks. The module should be able to determine the minimal number of distinct deadlines present in a given list of task deadlines, such that each task has a unique deadline.
+
+Each task has a given deadline, and some tasks may share the same deadline initially. Jamie needs to adjust some deadlines so that all tasks have unique deadlines that are not already assigned to another task. The adjusted deadlines should be the smallest possible distinct non-negative integers not already in the list of deadlines.
+
+Write a function to help Jamie determine the minimal number of distinct deadlines needed.
+
+**Input**:
+- An integer `n`, the number of tasks.
+- A list of `n` non-negative integers representing the deadlines of the tasks.
+
+**Output**:
+- A single integer, the minimal number of distinct deadlines needed.
+
+**Example**:
+```python
+def minimal_distinct_deadlines(n, deadlines):
+    # Your implementation here
+
+# Example 1
+n = 5
+deadlines = [1, 2, 2, 3, 5]
+print(minimal_distinct_deadlines(n, deadlines))  # Output: 5
+
+# Example 2
+n = 4
+deadlines = [0, 0, 0, 0]
+print(minimal_distinct_deadlines(n, deadlines))  # Output: 4
+```
+
+**Explanation**:
+For the first example, the list [1, 2, 2, 3, 5] can be converted to [1, 2, 3, 4, 5], which has 5 distinct deadlines. However, converting it to [1, 2, 2, 3, 4] does not fulfill the requirement of distinct deadlines. Hence the minimal number of distinct deadlines needed is 5.
+
+For the second example, the list [0, 0, 0, 0] needs to be converted to [0, 1, 2, 3], thereby requiring 4 distinct deadlines.
